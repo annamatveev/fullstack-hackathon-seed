@@ -1,18 +1,15 @@
-/*
- * HomePage
- *
- * This is the first thing users see of our App, at the '/' route
- *
- */
-
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
-import messages from './messages';
+import Header from 'components/Header';
+import TasksTable from '../TasksTable';
+import TasksProvider from '../TasksProvider';
 
 export default function HomePage() {
   return (
-    <h1>
-      <FormattedMessage {...messages.header} />
-    </h1>
+    <React.Fragment>
+      <Header />
+      <TasksProvider>
+        <TasksTable />
+      </TasksProvider>
+    </React.Fragment>
   );
 }

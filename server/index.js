@@ -2,7 +2,6 @@
 
 const express = require('express');
 const logger = require('./logger');
-
 const argv = require('./argv');
 const port = require('./port');
 const setup = require('./middlewares/frontendMiddleware');
@@ -14,8 +13,13 @@ const ngrok =
 const { resolve } = require('path');
 const app = express();
 
-// If you need a backend, e.g. an API, add your custom backend-specific middleware here
-// app.use('/api', myApi);
+const db = require('./db');
+const config = require('./config');
+
+const bodyParser = require('body-parser');
+app.use(bodyParser.json());
+const routes = require('./routes');
+app.use('/api', routes);
 
 // In production we need to pass these values in instead of relying on webpack
 setup(app, {
@@ -35,22 +39,30 @@ app.get('*.js', (req, res, next) => {
   next();
 });
 
-// Start your app.
-app.listen(port, host, async err => {
+// Connect to mongo
+db.connect(config.mongodb_uri, function(err) {
   if (err) {
-    return logger.error(err.message);
-  }
-
-  // Connect to ngrok in dev mode
-  if (ngrok) {
-    let url;
-    try {
-      url = await ngrok.connect(port);
-    } catch (e) {
-      return logger.error(e);
-    }
-    logger.appStarted(port, prettyHost, url);
+    console.log('Unable to connect to Mongo.');
+    process.exit(1);
   } else {
-    logger.appStarted(port, prettyHost);
+    // Start your app.
+    app.listen(port, host, async err => {
+      if (err) {
+        return logger.error(err.message);
+      }
+
+      // Connect to ngrok in dev mode
+      if (ngrok) {
+        let url;
+        try {
+          url = await ngrok.connect(port);
+        } catch (e) {
+          return logger.error(e);
+        }
+        logger.appStarted(port, prettyHost, url);
+      } else {
+        logger.appStarted(port, prettyHost);
+      }
+    });
   }
 });
