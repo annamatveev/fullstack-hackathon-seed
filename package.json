@@ -86,7 +86,7 @@
     "intl": "1.2.5",
     "invariant": "2.2.4",
     "ip": "1.1.5",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "material-color-hash": "^0.1.6",
     "minimist": "1.2.0",
     "mongodb": "^3.3.2",
